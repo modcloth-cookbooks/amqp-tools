@@ -1,4 +1,5 @@
 package 'golang'
+package 'git'
 
 bash 'build' do
   environment(
