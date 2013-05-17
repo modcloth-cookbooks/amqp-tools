@@ -1,5 +1,5 @@
-package 'golang'
-package 'git'
+include_recipe 'golang'
+include_recipe 'git'
 
 bash 'build' do
   environment(
