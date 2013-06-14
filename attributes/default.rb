@@ -4,3 +4,4 @@ default['install_prefix'] = (
     'smartos' => '/opt/local'
   }.fetch(node['platform'], '/usr/local')
 )
+normal['go']['version'] = '1.1.1'
