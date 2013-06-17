@@ -17,7 +17,7 @@ bash 'build' do
   )
   code <<-EOB
     set -e
-    mkdir -p #{gopath}
+    mkdir -p #{gopath}/bin
     export GOPATH="#{gopath}:"
     go get -x -u github.com/modcloth/amqp-tools
     go install -x github.com/modcloth/amqp-tools/amqp-consume-cat
