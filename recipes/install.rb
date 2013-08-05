@@ -52,7 +52,7 @@ bash 'install-amqp-tools' do
       /sbin
     }.join(':'),
     'GOPATH' => "#{gopath}:",
-    'GOBIN' => ''
+    'GOBIN' => "#{gopath}/bin"
   )
   action :nothing
   notifies :create, "link[#{node['install_prefix']}/bin/amqp-consume-cat]"
