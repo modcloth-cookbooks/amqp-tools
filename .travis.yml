@@ -1,0 +1,5 @@
+---
+language: ruby
+script:
+- bundle exec berks install
+- bundle exec foodcritic --epic-fail any .
