@@ -1,5 +1,6 @@
 #
 # Cookbook Name:: amqp-tools
+# Recipe:: install
 #
 # Copyright 2013, ModCloth, Inc.
 #
@@ -23,12 +24,47 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-default['install_prefix'] = (
-  {
-    'solaris2' => '/opt/local',
-    'smartos' => '/opt/local'
-  }.fetch(node['platform'], '/usr/local')
-)
+gopath = "#{node['install_prefix']}/go/shared/gopath"
 
-default['amqp_tools']['git_repo'] = 'https://github.com/modcloth/amqp-tools'
-default['amqp_tools']['git_ref'] = 'master'
+directory "#{gopath}/bin" do
+  mode 0755
+  recursive true
+end
+
+git "#{Chef::Config[:file_cache_path]}/amqp-tools" do
+  repository node['amqp_tools']['git_repo']
+  reference node['amqp_tools']['git_ref']
+  action :sync
+  notifies :run, 'bash[install-amqp-tools]'
+end
+
+bash 'install-amqp-tools' do
+  cwd "#{Chef::Config[:file_cache_path]}/amqp-tools"
+  code 'make'
+  environment(
+    'PATH' => %w{
+      /opt/local/bin
+      /opt/local/sbin
+      /usr/bin
+      /usr/local/go/bin
+      /usr/sbin
+      /bin
+      /sbin
+    }.join(':'),
+    'GOPATH' => "#{gopath}:",
+    'GOBIN' => "#{gopath}/bin"
+  )
+  action :nothing
+  notifies :create, "link[#{node['install_prefix']}/bin/amqp-consume-cat]"
+  notifies :create, "link[#{node['install_prefix']}/bin/amqp-publish-files]"
+end
+
+%w(
+  amqp-consume-cat
+  amqp-publish-files
+).each do |exe|
+  link "#{node['install_prefix']}/bin/#{exe}" do
+    to "#{gopath}/bin/#{exe}"
+    action :nothing
+  end
+end
